@@ -136,7 +136,7 @@ static void *KVOContext = &KVOContext;
     [super layoutSubviews];
     
     // Translate the container view's content offset to contentView bounds.
-    // This keeps the contentview always centered on the visible portion of the container view's
+    // This keeps the contentView always centered on the visible portion of the container view's
     // full content size, and avoids the need to make the contentView large enough to fit the
     // container view's full content size.
     self.contentView.frame = self.bounds;
@@ -201,7 +201,14 @@ static void *KVOContext = &KVOContext;
     // scrolling when it is not needed.
     CGFloat minimumContentHeight = self.bounds.size.height - (self.contentInset.top + self.contentInset.bottom);
 
+    CGPoint initialContentOffset = self.contentOffset;
     self.contentSize = CGSizeMake(self.bounds.size.width, fmax(yOffsetOfCurrentSubview, minimumContentHeight));
+    
+    // If contentOffset changes after contentSize change, we need to trigger layout update one more time.
+    if (!CGPointEqualToPoint(initialContentOffset, self.contentOffset)) {
+        [self setNeedsLayout];
+        [self layoutIfNeeded];
+    }
 }
 
 @end
